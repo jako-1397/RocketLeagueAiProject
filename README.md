@@ -8,14 +8,14 @@ Wiki: [RLBot/python-interface/wiki](https://github.com/RLBot/python-interface/wi
 
 1. Install [Python 3.12 or later](https://www.python.org/)
 1. Create a Python virtual environment
-   - `python -m venv venv`
+    - `python -m venv venv`
 1. Activate the virtual environment
-   - Windows: `.\venv\Scripts\activate`
-   - Linux: `source venv/bin/activate`
+    - Windows: `.\venv\Scripts\activate`
+    - Linux: `source venv/bin/activate`
 1. Install the required packages
-   - `pip install -r requirements.txt`
+    - `pip install -r requirements.txt`
 1. Modify `rlbot.toml` to your liking
-   - Note: `dev.toml` also exists with a few changed settings that might be useful for development
+    - Note: `dev.toml` also exists with a few changed settings that might be useful for development
 1. Start a match with `python run.py`
 
 ## Changing the bot
@@ -27,22 +27,28 @@ Wiki: [RLBot/python-interface/wiki](https://github.com/RLBot/python-interface/wi
 
 1. `pip install pyinstaller`
 1. `pyinstaller --onefile src/bot.py --paths src` -
-  This will create a file called `bot.spec`.
+   This will create a file called `bot.spec`.
 1. Create `bob.toml` in the same directory as the spec file with the following content:
-   ```toml
-   [[config]]
-   project_name = "PythonExample"
-   bot_configs = ["src/bot.toml"]
 
-   [config.builder_config]
-   builder_type = "pyinstaller"
-   entry_file = "bot.spec"
-   ```
+    ```toml
+    [[config]]
+    project_name = "PythonExample"
+    bot_configs = ["src/bot.toml"]
 
-   - `project_name` will be the name of your bot's folder in the botpack
-   - `bot_configs` is a list of bot configs that will be included in the botpack
-   - `builder_type` should always be `pyinstaller`
-   - `entry_file` is the name of the spec file
+    [config.builder_config]
+    builder_type = "pyinstaller"
+    entry_file = "bot.spec"
+    ```
+
+    - `project_name` will be the name of your bot's folder in the botpack
+    - `bot_configs` is a list of bot configs that will be included in the botpack
+    - `builder_type` should always be `pyinstaller`
+    - `entry_file` is the name of the spec file
 
 1. Commit both `bot.spec` and `bob.toml` to your bot's repository.
-  Note that `bob.toml` CANNOT be renamed, but `bot.spec` can be anything as long as `entry_file` is also renamed to reflect the change.
+   Note that `bob.toml` CANNOT be renamed, but `bot.spec` can be anything as long as `entry_file` is also renamed to reflect the change.
+
+## Link die wir für den Download benutzt hatten:
+
+- https://github.com/RLBot/core/releases/tag/v5.0.0-rc17
+- https://github.com/RLBot/python-example
