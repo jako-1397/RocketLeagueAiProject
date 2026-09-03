@@ -3,7 +3,7 @@
 # use this along with launcher = "custom"
 # launcher_arg = "legendary"
 # "Steam", "Epic", "Custom", "NoLaunch"
-launcher = "Steam"
+launcher = "Epic"
 # Should RLBot start the bot processes automatically, or will a separate script start them
 auto_start_agents = true
 # Should RLBot wait for the bot processes to start before starting the match
