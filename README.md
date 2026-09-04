@@ -16,7 +16,7 @@ Wiki: [RLBot/python-interface/wiki](https://github.com/RLBot/python-interface/wi
     - `pip install -r requirements.txt`
 1. Modify `rlbot.toml` to your liking
     - Note: `dev.toml` also exists with a few changed settings that might be useful for development
-1. Download "RLBotServer.exe" form `https://github.com/RLBot/core/releases/tag/v5.0.0-rc17`
+1. Download "RLBotServer.exe" form `https://github.com/RLBot/core/releases/tag/v5.0.0-rc17` into this Project
 1. Start a match with `python run.py`
 
 ## Changing the bot
