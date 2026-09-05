@@ -1,1 +1,4 @@
 rlbot>=2.0.0.beta
+rlgym
+stable-baselines3
+#rlgym-compat (als Brücke für RLBot)

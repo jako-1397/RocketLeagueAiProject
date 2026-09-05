@@ -97,7 +97,7 @@ type = "Human"
 team = "Blue"
 
 [[cars]]
-config_file = "src/bot.toml"
+config_file = "example_bot/bot.toml"
 team = "Orange"
 # If RLBot should start this bot automatically with its specified `run_command` or not
 auto_start = true

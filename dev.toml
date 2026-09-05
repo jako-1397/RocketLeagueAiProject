@@ -2,7 +2,7 @@
 [rlbot]
 launcher = "Steam"
 # We'll run the bot ourself so we don't have restart the match
-# `python src/bot.py` in our case
+# `python example_bot/bot.py` in our case
 auto_start_agents = false
 
 [match]
@@ -12,5 +12,5 @@ enable_rendering = true
 match_length = "Unlimited"
 
 [[cars]]
-config_file = "src/bot.toml"
+config_file = "example_bot/bot.toml"
 team = 0
