@@ -17,4 +17,4 @@ class MLBot(Bot):
 
 
 if __name__ == "__main__":
-    MLBot("rocketleagueaiproject/rlgym_hai").run()
+    MLBot("rocketleagueaiproject/rlgym_general").run()

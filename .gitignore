@@ -112,3 +112,6 @@ ENV/
 
 # RLBot
 RLBotServer*
+
+# run.py RLBot generated files
+_generated_match.toml
