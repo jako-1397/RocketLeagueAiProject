@@ -3,8 +3,8 @@
 name = "Jannis RLGym Bot"
 loadout_file = "loadout.toml"
 root_dir = ""
-run_command = "..\\..\\.venv\\Scripts\\python bot.py"
-run_command_linux = "../../.venv/bin/python bot.py"
+run_command = "..\\.venv\\Scripts\\python bot.py"
+run_command_linux = "../.venv/bin/python bot.py"
 agent_id = "rocketleagueaiproject/rlgym_jannis"
 logo_file = ""
 

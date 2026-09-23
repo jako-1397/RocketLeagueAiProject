@@ -15,7 +15,7 @@ def find_bots(root_dir: Path) -> list[tuple[str, Path]]:
     if example_toml.exists() and example_toml.stat().st_size > 0:
         bots.append(("example_bot", example_toml))
     for d in sorted(root_dir.glob(f"{RLGYM_PREFIX}*")):
-        toml_path = d / "bot" / "bot.toml"
+        toml_path = d / "bot.toml"
         if toml_path.exists() and toml_path.stat().st_size > 0:
             bots.append((d.name, toml_path))
     return bots
