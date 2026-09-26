@@ -1,4 +1,4 @@
 rlbot>=2.0.0.beta
-rlgym
-stable-baselines3
-#rlgym-compat (als Brücke für RLBot)
+rlgym[rl-sim]
+rlgym-ppo @ git+https://github.com/AechPro/rlgym-ppo
+numpy

@@ -10,35 +10,79 @@ Wiki: [RLBot/python-interface/wiki](https://github.com/RLBot/python-interface/wi
 - `rlgym_general/` – gemeinsame, offizielle RLGym-Grundlage des Teams
 - `rlgym_hai/`, `rlgym_jannis/`, `rlgym_gabriel/` – individuelle Experimentierstände, gleiche Struktur wie `rlgym_general/`:
     - `bot.py` / `bot.toml` / `loadout.toml` – der spielbare RLBot-Wrapper um das jeweils trainierte Modell
-    - `training/` – Trainings-Setup (`train.py`, `rewards.py`, `state_setters.py`) sowie `training/models/` mit den trainierten Checkpoints
-    - `history/` – archivierte Zwischenstände (wird automatisch von `history.py` angelegt)
-- `run.py` – interaktives Startskript für Testmatches
+    - `training/rewards.py` – legt fest, wofür der Bot beim Training belohnt wird (individuell anpassbar)
+    - `training/state_setters.py` – legt Start-/Kickoff-Positionen fest (individuell anpassbar)
+    - `training/models/` – hier landen die trainierten Checkpoints
+    - `history/` – archivierte Zwischenstände (siehe unten)
+- `run.py` – interaktives Startskript für Testmatches gegen einen Bot
+- `train.py` – interaktives Startskript zum Trainieren eines Bots
 - `history.py` – interaktives Skript zum Sichern/Wiederherstellen von Zwischenständen
 
 ## Quick Start
 
-1. Install [Python 3.12 or later](https://www.python.org/)
-2. Create a Python virtual environment
-    - `python -m venv venv`
-3. Activate the virtual environment
-    - Windows: `.\venv\Scripts\activate`
-    - Linux: `source venv/bin/activate`
-4. Install the required packages
-    - `pip install -r requirements.txt`
-5. Modify `rlbot.toml` to your liking
-    - Note: `dev.toml` also exists with a few changed settings that might be useful for development
-6. Download "RLBotServer.exe" from `https://github.com/RLBot/core/releases/tag/v5.0.0-rc17` into this project
-7. Start a match with:
-    ```
-    python run.py
-    ```
-    Du wirst gefragt, gegen welchen Bot du spielen möchtest (`example_bot` oder einer der `rlgym_*`-Bots). Du spielst dabei selbst als Mensch (Team Blau) gegen den gewählten Bot (Team Orange).
+### 1. Python 3.12 installieren
+
+Wichtig: Es muss **genau Python 3.12** sein, nicht die neueste Version. Grund (kurz erklärt): Unsere KI-Trainingsbibliothek (RLGym) unterstützt aktuell offiziell nur bis Python 3.12 – das ist bei spezialisierter KI-Software normal, sie zieht mit neuen Python-Versionen oft erst später nach. Falls du bereits eine neuere Python-Version installiert hast, ist das kein Problem – wir installieren 3.12 einfach zusätzlich, ohne etwas zu verändern.
+
+- Lade Python 3.12 von [python.org/downloads](https://www.python.org/downloads/) herunter (z. B. 3.12.10)
+- Beim Installer reicht **"Install Now"**, keine weiteren Einstellungen nötig
+
+### 2. Virtuelle Umgebung anlegen
+
+Im Projektordner, in PowerShell:
+
+```powershell
+py -3.12 -m venv venv
+.\venv\Scripts\activate
+```
+
+Prüfen, ob es geklappt hat:
+
+```powershell
+python --version
+```
+
+Sollte `Python 3.12.x` anzeigen, und links im Terminal sollte `(venv)` stehen.
+
+Falls du das Terminal später neu öffnest, muss die Umgebung jedes Mal erneut aktiviert werden:
+
+```powershell
+.\venv\Scripts\activate
+```
+
+### 3. Pakete installieren
+
+```powershell
+pip install -r requirements.txt
+```
+
+### 4. RLBotServer bereitstellen
+
+Lade "RLBotServer.exe" von `https://github.com/RLBot/core/releases/tag/v5.0.0-rc17` herunter und lege sie ins Projektverzeichnis.
+
+### 5. Match starten
+
+```powershell
+python run.py
+```
+
+Du wirst gefragt, gegen welchen Bot du spielen möchtest (`example_bot` oder einer der `rlgym_*`-Bots). Du spielst dabei selbst als Mensch (Team Blau) gegen den gewählten Bot (Team Orange).
+
+## Einen Bot trainieren
+
+```powershell
+python train.py
+```
+
+Du wirst gefragt, für welches Projekt trainiert werden soll (`rlgym_general`, `rlgym_hai`, `rlgym_jannis` oder `rlgym_gabriel`). Das Training läuft dann im Hintergrund (kein Rocket-League-Fenster nötig) und speichert regelmäßig Zwischenstände in `training/models/` des gewählten Projekts. Je nach Rechner kann ein sinnvoller Trainingslauf mehrere Stunden dauern – das Fenster kann in der Zeit einfach offen bleiben.
+
+Wer eigene Ideen für Belohnungen oder Startpositionen ausprobieren will, passt `training/rewards.py` bzw. `training/state_setters.py` im eigenen Projektordner an (siehe Kommentare in den Dateien).
 
 ## Zwischenstände sichern/wiederherstellen
 
 Für den Trainingsnachweis kann jeder den aktuellen Stand seines Projektordners als ZIP archivieren:
 
-```
+```powershell
 python history.py
 ```
 
