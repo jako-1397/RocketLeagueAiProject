@@ -68,7 +68,7 @@ def build_rlgym_env(project_dir: Path):
         action_parser=RepeatAction(LookupTableAction(), repeats=TICK_SKIP),
         reward_fn=reward_fn,
         termination_cond=GoalCondition(),
-        truncation_cond=NoTouchTimeoutCondition(timeout=TIMEOUT_SECONDS),
+        truncation_cond=NoTouchTimeoutCondition(timeout_seconds=TIMEOUT_SECONDS),
         transition_engine=RocketSimEngine(),
     )
     return RLGymV2GymWrapper(rlgym_env)
@@ -89,7 +89,8 @@ if __name__ == "__main__":
         env_create_function=functools.partial(build_rlgym_env, project_dir),
         n_proc=8,  # bei schwaecherer CPU reduzieren, z.B. auf 4
         checkpoints_save_folder=str(models_dir),
-        checkpoint_load_folder=None,  # None = immer frisch starten, nicht automatisch fortsetzen
+        checkpoint_load_folder="latest",  # laedt automatisch den neuesten Checkpoint, falls vorhanden
+        add_unix_timestamp=False,   # keine Zeitstempel-Nachbarordner mehr
         save_every_ts=100_000,
         timestep_limit=1_000_000_000,
     )

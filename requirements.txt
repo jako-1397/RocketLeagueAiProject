@@ -2,3 +2,4 @@ rlbot>=2.0.0.beta
 rlgym[rl-sim]
 rlgym-ppo @ git+https://github.com/AechPro/rlgym-ppo
 numpy
+rlgym-compat
