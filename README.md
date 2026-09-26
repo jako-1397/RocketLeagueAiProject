@@ -10,13 +10,12 @@ Wiki: [RLBot/python-interface/wiki](https://github.com/RLBot/python-interface/wi
 - `rlgym_general/` – gemeinsame, offizielle RLGym-Grundlage des Teams
 - `rlgym_hai/`, `rlgym_jannis/`, `rlgym_gabriel/` – individuelle Experimentierstände, gleiche Struktur wie `rlgym_general/`:
     - `bot.py` / `bot.toml` / `loadout.toml` – der spielbare RLBot-Wrapper um das jeweils trainierte Modell
+    - `act.py` / `obs.py` / `discrete_policy.py` – Hilfsmodule, die `bot.py` nutzt, um das trainierte Modell live im Spiel auszuführen
     - `training/rewards.py` – legt fest, wofür der Bot beim Training belohnt wird (individuell anpassbar)
     - `training/state_setters.py` – legt Start-/Kickoff-Positionen fest (individuell anpassbar)
-    - `training/models/` – hier landen die trainierten Checkpoints
-    - `history/` – archivierte Zwischenstände (siehe unten)
+    - `training/models/` – alle Trainings-Checkpoints, dauerhaft (siehe unten)
 - `run.py` – interaktives Startskript für Testmatches gegen einen Bot
 - `train.py` – interaktives Startskript zum Trainieren eines Bots
-- `history.py` – interaktives Skript zum Sichern/Wiederherstellen von Zwischenständen
 
 ## Quick Start
 
@@ -66,7 +65,7 @@ Lade "RLBotServer.exe" von `https://github.com/RLBot/core/releases/tag/v5.0.0-rc
 python run.py
 ```
 
-Du wirst gefragt, gegen welchen Bot du spielen möchtest (`example_bot` oder einer der `rlgym_*`-Bots). Du spielst dabei selbst als Mensch (Team Blau) gegen den gewählten Bot (Team Orange).
+Du wirst gefragt, gegen welchen Bot du spielen möchtest (`example_bot` oder einer der `rlgym_*`-Bots). Du spielst dabei selbst als Mensch (Team Blau) gegen den gewählten Bot (Team Orange), der live mit seinem aktuellsten trainierten Checkpoint spielt.
 
 ## Einen Bot trainieren
 
@@ -74,29 +73,30 @@ Du wirst gefragt, gegen welchen Bot du spielen möchtest (`example_bot` oder ein
 python train.py
 ```
 
-Du wirst gefragt, für welches Projekt trainiert werden soll (`rlgym_general`, `rlgym_hai`, `rlgym_jannis` oder `rlgym_gabriel`). Das Training läuft dann im Hintergrund (kein Rocket-League-Fenster nötig) und speichert regelmäßig Zwischenstände in `training/models/` des gewählten Projekts. Je nach Rechner kann ein sinnvoller Trainingslauf mehrere Stunden dauern – das Fenster kann in der Zeit einfach offen bleiben.
+Du wirst gefragt, für welches Projekt trainiert werden soll (`rlgym_general`, `rlgym_hai`, `rlgym_jannis` oder `rlgym_gabriel`). Das Training läuft dann im Hintergrund (kein Rocket-League-Fenster nötig) und speichert regelmäßig Checkpoints in `training/models/` des gewählten Projekts. Startest du `train.py` erneut für dasselbe Projekt, wird automatisch am letzten Checkpoint weitertrainiert statt von vorne zu beginnen. Je nach Rechner kann ein sinnvoller Trainingslauf mehrere Stunden dauern – das Fenster kann in der Zeit einfach offen bleiben.
 
 Wer eigene Ideen für Belohnungen oder Startpositionen ausprobieren will, passt `training/rewards.py` bzw. `training/state_setters.py` im eigenen Projektordner an (siehe Kommentare in den Dateien).
 
-## Zwischenstände sichern/wiederherstellen
+## Trainierte Modelle und deren Historie
 
-Für den Trainingsnachweis kann jeder den aktuellen Stand seines Projektordners als ZIP archivieren:
+`training/models/` wird bewusst **nicht** von Git ignoriert, und Checkpoints werden **nie automatisch gelöscht** – jeder je gespeicherte Trainingsstand bleibt dauerhaft als eigener Unterordner erhalten (benannt nach der Anzahl trainierter Zeitschritte, z. B. `1000000`, `2000000`, ...). Das dient gleichzeitig als vollständiger Trainingsnachweis über den gesamten Projektzeitraum – ein separates Backup-Skript ist dafür nicht nötig.
+
+Committen/pushen (z. B. über die Quellcodeverwaltung in VS Code) läuft dabei ganz normal wie bei jeder anderen Datei:
 
 ```powershell
-python history.py
+git add rlgym_<name>/training/models
+git commit -m "Neue Trainings-Checkpoints"
+git push
 ```
 
-- Zuerst das Projekt wählen (`rlgym_general`, `rlgym_hai`, `rlgym_jannis` oder `rlgym_gabriel`)
-- Dann entweder **speichern** (landet als `history/<Zeitstempel>.zip` im jeweiligen Ordner) oder den **letzten Zwischenstand wiederherstellen** (überschreibt vorhandene gleichnamige Dateien, löscht aber nichts zusätzlich Vorhandenes)
+Alle anderen im Team sehen den aktuellen wie auch den gesamten historischen Modellstand nach ihrem nächsten Pull direkt im jeweiligen Ordner.
 
-## Trainierte Modelle teilen
-
-`training/models/` wird bewusst **nicht** von Git ignoriert. Ein neu trainierter Checkpoint wird also ganz normal Teil deiner nächsten Änderungen: Sobald du wie gewohnt committest und pusht (z. B. über die Quellcodeverwaltung in VS Code), wird er automatisch mit hochgeladen. Alle anderen im Team sehen den aktuellen Modellstand dann nach ihrem nächsten Pull direkt im jeweiligen Ordner.
+Die Entwicklung der Belohnungslogik selbst (`rewards.py`, `state_setters.py`) lässt sich jederzeit über die normale Git-Commit-Historie dieser Dateien nachvollziehen (`git log -p rlgym_<name>/training/rewards.py`).
 
 ## Changing the bots
 
 - `example_bot/bot.py` – statische, regelbasierte Logik
-- `rlgym_<name>/bot.py` – lädt (sobald trainiert) das jeweilige RLGym-Modell
+- `rlgym_<name>/bot.py` – lädt automatisch den neuesten Checkpoint aus `training/models/` und lässt das trainierte Modell live spielen
 - Aussehen jeweils über die zugehörige `loadout.toml` im selben Ordner
 
 ## Configuring for the v5 botpack

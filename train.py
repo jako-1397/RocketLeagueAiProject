@@ -91,7 +91,8 @@ if __name__ == "__main__":
         checkpoints_save_folder=str(models_dir),
         checkpoint_load_folder="latest",  # laedt automatisch den neuesten Checkpoint, falls vorhanden
         add_unix_timestamp=False,   # keine Zeitstempel-Nachbarordner mehr
-        save_every_ts=100_000,
+        save_every_ts=1_000_000,
+        n_checkpoints_to_keep=1_000_000_000,
         timestep_limit=1_000_000_000,
     )
     print(f"\nStarte Training fuer '{project_dir.name}' ...")
