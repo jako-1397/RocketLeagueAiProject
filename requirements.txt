@@ -3,3 +3,4 @@ rlgym[rl-sim]
 rlgym-ppo @ git+https://github.com/AechPro/rlgym-ppo
 numpy
 rlgym-compat
+rlgym-tools>=2.6.5

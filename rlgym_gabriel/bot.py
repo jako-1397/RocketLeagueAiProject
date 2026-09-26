@@ -42,10 +42,10 @@ class MLBot(Bot):
         self.action_parser = LookupTableAction()
         self.obs_builder = DefaultObs(
             zero_padding=None,
-            pos_coef=np.asarray([1 / 4096, 1 / 5120, 1 / 2044]),
+            pos_coef=np.asarray([1 / 4096, 1 / 6000, 1 / 2044]),
             ang_coef=1 / np.pi,
             lin_vel_coef=1 / 2300,
-            ang_vel_coef=1 / np.pi,
+            ang_vel_coef=1 / 5.5,
         )
         self.game_state = GameState.create_compat_game_state(self.field_info)
         self.ticks = TICK_SKIP
