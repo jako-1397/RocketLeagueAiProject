@@ -85,38 +85,51 @@ class CooldownTouchReward(RewardFunction[AgentID, GameState, float]):
 
     Problem von `TouchReward`: Bei tick_skip=8 gibt es ~15 Schritte pro Sekunde. Schiebt der Bot
     den Ball nur vor sich her, kassiert er bis zu 15x pro Sekunde den vollen Touch-Reward
-    ("Ball-Kuscheln"). Hier gibt es den festen `touch_reward` erst wieder, wenn seit der letzten
-    belohnten Beruehrung `cooldown_seconds` vergangen sind.
+    ("Ball-Kuscheln"). Hier gibt es den festen `touch_reward` nur fuer eine NEUE Beruehrung, d.h.
+    wenn das Auto den Ball mindestens `cooldown_seconds` lang nicht beruehrt hat. Dauerhaftes
+    Schieben bringt den Touch-Reward also genau einmal (die Abklingzeit laeuft ab der letzten
+    Beruehrung, nicht ab der letzten belohnten - sonst gaebe es beim Schieben 2x pro Sekunde Reward).
 
     `acceleration_reward` belohnt zusaetzlich die Geschwindigkeitsaenderung des Balls
     (|dv| / BALL_MAX_SPEED) bei jeder Beruehrung - harte Schuesse zaehlen mehr als Anstupsen,
     und Schieben mit konstantem Tempo bringt fast nichts. Diesen Teil gibt es ohne Abklingzeit.
+    Mit `directional=True` wird er mit (1 + cos(dv, Richtung gegnerisches Tor)) / 2 gewichtet:
+    voll Richtung gegnerisches Tor, halb zur Seite, null Richtung eigenes Tor.
     """
 
-    def __init__(self, touch_reward: float = 1.0, acceleration_reward: float = 0.0, cooldown_seconds: float = 0.5):
+    def __init__(self, touch_reward: float = 1.0, acceleration_reward: float = 0.0, cooldown_seconds: float = 0.5,
+                 directional: bool = False):
         self.touch_reward = touch_reward
         self.acceleration_reward = acceleration_reward
         self.cooldown_ticks = cooldown_seconds * TICKS_PER_SECOND
+        self.directional = directional
         self.prev_ball_vel = None
-        self.last_rewarded_tick = {}
+        self.last_touch_tick = {}
 
     def reset(self, agents: List[AgentID], initial_state: GameState, shared_info: Dict[str, Any]) -> None:
         self.prev_ball_vel = initial_state.ball.linear_velocity.copy()
-        self.last_rewarded_tick = {agent: -np.inf for agent in agents}
+        self.last_touch_tick = {agent: -np.inf for agent in agents}
 
     def get_rewards(self, agents: List[AgentID], state: GameState, is_terminated: Dict[AgentID, bool],
                     is_truncated: Dict[AgentID, bool], shared_info: Dict[str, Any]) -> Dict[AgentID, float]:
         ball_vel = state.ball.linear_velocity
-        acceleration = float(np.linalg.norm(ball_vel - self.prev_ball_vel) / BALL_MAX_SPEED)
+        delta_vel = ball_vel - self.prev_ball_vel
+        acceleration = float(np.linalg.norm(delta_vel) / BALL_MAX_SPEED)
         self.prev_ball_vel = ball_vel.copy()
 
         rewards = {}
         for agent in agents:
             reward = 0.0
-            if state.cars[agent].ball_touches > 0:
-                reward += self.acceleration_reward * acceleration
-                if state.tick_count - self.last_rewarded_tick.get(agent, -np.inf) >= self.cooldown_ticks:
+            car = state.cars[agent]
+            if car.ball_touches > 0:
+                factor = 1.0
+                if self.directional:
+                    target = _ORANGE_GOAL_BACK if car.is_blue else _BLUE_GOAL_BACK
+                    cos = float(np.dot(_unit(delta_vel), _unit(target - state.ball.position)))
+                    factor = 0.5 * (1.0 + cos)
+                reward += self.acceleration_reward * acceleration * factor
+                if state.tick_count - self.last_touch_tick.get(agent, -np.inf) >= self.cooldown_ticks:
                     reward += self.touch_reward
-                    self.last_rewarded_tick[agent] = state.tick_count
+                self.last_touch_tick[agent] = state.tick_count
             rewards[agent] = reward
         return rewards

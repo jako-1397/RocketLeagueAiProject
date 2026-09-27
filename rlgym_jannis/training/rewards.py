@@ -13,7 +13,7 @@ from rlgym.rocket_league.reward_functions import CombinedReward, GoalReward
 from rlgym_tools.rocket_league.reward_functions.goal_prob_reward import GoalViewReward
 from rlgym_tools.rocket_league.reward_functions.velocity_player_to_ball_reward import VelocityPlayerToBallReward
 
-from RocketLeagueAiProject.reward_lib import CooldownTouchReward, FaceBallReward, VelocityBallToGoalReward
+from reward_lib import CooldownTouchReward, FaceBallReward, VelocityBallToGoalReward
 
 PHASE = 1
 
@@ -30,9 +30,11 @@ def _phase_1():
         (VelocityPlayerToBallReward(include_negative_values=False), 1.0),
         # Kleine Hilfe beim Ausrichten. Bewusst schwach, damit es nicht wichtiger ist als Fahren.
         (FaceBallReward(), 0.25),
-        # Der eigentliche Lernanreiz dieser Phase. Mit Abklingzeit gegen Ball-Kuscheln;
-        # der Beschleunigungsanteil macht einen echten Schlag wertvoller als Anstupsen.
-        (CooldownTouchReward(touch_reward=1.0, acceleration_reward=2.0, cooldown_seconds=0.5), 1.0),
+        # Der eigentliche Lernanreiz dieser Phase. Touch-Reward nur fuer neue Beruehrungen
+        # (Schieben zaehlt einmal); der Beschleunigungsanteil macht einen echten Schlag wertvoller
+        # als Anstupsen und zaehlt mit directional=True nur Richtung gegnerisches Tor voll.
+        (CooldownTouchReward(touch_reward=1.0, acceleration_reward=2.0, cooldown_seconds=0.5,
+                             directional=True), 1.0),
         # Schwacher Richtungshinweis schon ab Start: sonst lernt der Bot, den Ball egal wohin
         # zu hauen, und muss das spaeter muehsam wieder verlernen. Negativ Richtung eigenes Tor.
         (VelocityBallToGoalReward(), 0.5),
@@ -46,7 +48,8 @@ def _phase_2():
     """ENTWURF - Richtung Tor spielen. Erst anpassen, wenn Phase 1 sitzt."""
     return CombinedReward(
         (VelocityPlayerToBallReward(include_negative_values=True), 0.5),
-        (CooldownTouchReward(touch_reward=0.3, acceleration_reward=2.0, cooldown_seconds=0.5), 1.0),
+        (CooldownTouchReward(touch_reward=0.3, acceleration_reward=2.0, cooldown_seconds=0.5,
+                             directional=True), 1.0),
         (VelocityBallToGoalReward(), 2.0),
         # Potentialbasiert (Ng et al. 1999): belohnt jede Verbesserung der Torchance,
         # bestraft jede Verschlechterung. Summe ueber eine Episode ist beschraenkt.
@@ -59,7 +62,8 @@ def _phase_3():
     """ENTWURF - Tore entscheiden, Hilfs-Rewards fast weg."""
     return CombinedReward(
         (VelocityPlayerToBallReward(include_negative_values=True), 0.1),
-        (CooldownTouchReward(touch_reward=0.05, acceleration_reward=1.0, cooldown_seconds=0.5), 1.0),
+        (CooldownTouchReward(touch_reward=0.05, acceleration_reward=1.0, cooldown_seconds=0.5,
+                             directional=True), 1.0),
         (VelocityBallToGoalReward(), 1.0),
         (GoalViewReward(), 5.0),
         (GoalReward(), 30.0),
